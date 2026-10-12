@@ -23,15 +23,21 @@ def current_user():
     user_id = session.get("user_id")
     if not user_id:
         return None
-    return get_db().execute(
+    user = get_db().execute(
         "SELECT * FROM users WHERE id = ?", (user_id,)
     ).fetchone()
+    if user is None:
+        # Session points at a user that no longer exists (e.g. the database
+        # was reset or the cookie is from a previous deployment). Drop it so
+        # the visitor is treated as logged out instead of crashing.
+        session.pop("user_id", None)
+    return user
 
 
 def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
-        if not session.get("user_id"):
+        if not current_user():
             return redirect(url_for("auth.login", redirect=request.path))
         return view(*args, **kwargs)
 

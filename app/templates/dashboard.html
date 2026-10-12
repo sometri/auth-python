@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ t('auth.dashboardTitle') }} — V1 Travel{% endblock %}
+{% block content %}
+<div>
+  <div class="text-center mb-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-3">
+      <i data-lucide="check-circle-2" class="w-9 h-9 text-emerald-600"></i>
+    </div>
+    <h2 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.dashboardTitle') }}</h2>
+    <p class="mt-1 text-sm text-emerald-700">{{ t('auth.dashboardSubtitle') }}</p>
+  </div>
+
+  {% if current_user %}
+    <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 mb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-full bg-amber-500 text-emerald-950 flex items-center justify-center font-bold">
+          {{ current_user['name'][:1]|upper }}
+        </div>
+        <div class="text-left">
+          <p class="text-sm font-bold text-emerald-900">{{ current_user['name'] }}</p>
+          <p class="text-xs text-emerald-600">{{ current_user['email'] }}</p>
+        </div>
+      </div>
+      <div class="mt-3 text-[11px] text-emerald-600">
+        {{ t('auth.twoFactorOn') if current_user['two_factor_enabled'] else t('auth.twoFactorOff') }} · {{ current_user['role'] }}
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <a href="{{ url_for('auth.two_factor_settings') }}"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-emerald-200 bg-white text-sm font-bold rounded-xl text-emerald-900 hover:border-amber-500 transition-all">
+        <i data-lucide="shield" class="w-4 h-4"></i>
+        {{ t('auth.twoFactorSettings') }}
+      </a>
+      <a href="{{ url_for('auth.logout') }}"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        {{ t('auth.logout') }}
+      </a>
+    </div>
+  {% else %}
+    <div class="space-y-2">
+      <a href="{{ url_for('auth.login') }}"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
+        <i data-lucide="log-in" class="w-4 h-4"></i>
+        {{ t('auth.loginButton') }}
+      </a>
+      <a href="{{ url_for('auth.register') }}"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-emerald-200 bg-white text-sm font-bold rounded-xl text-emerald-900 hover:border-amber-500 transition-all">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+        {{ t('auth.register') }}
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

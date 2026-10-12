@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ t('auth.title') }} — V1 Travel{% endblock %}
+{% block content %}
+<div>
+  <div class="text-center mb-6">
+    <h2 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.title') }}</h2>
+    <p class="mt-1 text-sm text-emerald-700">{{ t('auth.subtitle') }}</p>
+  </div>
+
+  <form class="space-y-4" method="post" action="{{ url_for('auth.login', redirect=request.args.get('redirect')) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div>
+      <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.email') }}</label>
+      <div class="relative">
+        <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"></i>
+        <input name="email" type="email" required value="{{ email or '' }}"
+          class="appearance-none rounded-xl relative block w-full pl-10 pr-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:border-amber-500 text-sm"
+          placeholder="example@v1travel.com" />
+      </div>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <label class="block text-emerald-900 text-xs font-bold">{{ t('auth.password') }}</label>
+        <a href="{{ url_for('auth.forgot_password') }}" class="text-xs text-amber-600 hover:text-amber-500 font-medium">
+          {{ t('auth.forgotPassword') }}
+        </a>
+      </div>
+      <div class="relative">
+        <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"></i>
+        <input id="login-password" name="password" type="password" required
+          class="appearance-none rounded-xl relative block w-full pl-10 pr-10 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:border-amber-500 text-sm"
+          placeholder="••••••••" />
+        <button type="button" data-toggle-password="login-password"
+          class="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-500 hover:text-amber-600">
+          <i data-lucide="eye" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="pt-2">
+      <button type="submit"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 transition-all bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95">
+        <i data-lucide="log-in" class="w-4 h-4"></i>
+        {{ t('auth.loginButton') }}
+      </button>
+    </div>
+  </form>
+
+  <div class="text-center mt-6">
+    <p class="text-xs text-emerald-700">
+      {{ t('auth.noAccount') }}
+      <a href="{{ url_for('auth.register', redirect=request.args.get('redirect')) }}"
+        class="font-bold text-amber-600 hover:text-amber-500 underline">{{ t('auth.registerLink') }}</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}V1 Travel — Auth{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Moul&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { moul: ['Moul', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="min-h-screen bg-emerald-50/50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-2 text-emerald-900 group">
+        <span class="w-12 h-12 rounded-full bg-amber-500 text-emerald-950 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+          <i data-lucide="compass" class="w-6 h-6"></i>
+        </span>
+        <span class="font-moul text-2xl font-bold tracking-tight">V1 Travel</span>
+      </a>
+    </div>
+    <div class="text-xs">
+      <a href="{{ url_for('main.set_language', lang='en') }}" class="{% if lang == 'en' %}font-bold text-amber-600{% else %}text-emerald-600 hover:text-amber-600{% endif %}">EN</a>
+      <span class="text-emerald-300 mx-1">|</span>
+      <a href="{{ url_for('main.set_language', lang='km') }}" class="{% if lang == 'km' %}font-bold text-amber-600{% else %}text-emerald-600 hover:text-amber-600{% endif %}">ខ្មែរ</a>
+    </div>
+  </div>
+
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-6 shadow-xl sm:rounded-3xl sm:px-10 border border-emerald-100">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="mb-4 p-3 rounded-xl text-xs font-medium border
+              {% if category == 'error' %}bg-rose-50 text-rose-800 border-rose-200{% else %}bg-emerald-50 text-emerald-800 border-emerald-200{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ t('auth.twoFactorSettings') }} — V1 Travel{% endblock %}
+{% block content %}
+<div>
+  <div class="text-center mb-6">
+    <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 mb-3">
+      <i data-lucide="shield" class="w-7 h-7 text-emerald-700"></i>
+    </div>
+    <h2 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.twoFactorSettings') }}</h2>
+  </div>
+
+  {% if current_user['two_factor_enabled'] %}
+    <div class="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+      {{ t('auth.twoFactorOn') }}
+    </div>
+
+    {% if recovery_codes %}
+      <div class="mb-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+        <p class="text-xs font-bold text-amber-900 mb-2">{{ t('auth.recoveryCodes') }}</p>
+        <div class="grid grid-cols-2 gap-1 font-mono text-xs text-amber-800">
+          {% for code in recovery_codes %}<span>{{ code }}</span>{% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('auth.two_factor_settings') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="disable" />
+      <button type="submit"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-rose-200 bg-rose-50 text-sm font-bold rounded-xl text-rose-700 hover:bg-rose-100 transition-all">
+        <i data-lucide="shield-off" class="w-4 h-4"></i>
+        {{ t('auth.disable2fa') }}
+      </button>
+    </form>
+  {% else %}
+    <p class="text-xs text-emerald-700 mb-4">{{ t('auth.scanHint') }}</p>
+
+    <div class="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+      <p class="text-[11px] text-emerald-600 mb-1">Secret</p>
+      <p class="font-mono text-sm text-emerald-900 break-all">{{ pending_secret }}</p>
+      <p class="text-[11px] text-emerald-600 mt-2 mb-1">otpauth URI</p>
+      <p class="font-mono text-[10px] text-emerald-500 break-all">{{ otpauth_uri }}</p>
+    </div>
+
+    <form class="space-y-4" method="post" action="{{ url_for('auth.two_factor_settings') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="action" value="enable" />
+      <input type="hidden" name="secret" value="{{ pending_secret }}" />
+      <div>
+        <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.twoFactorCode') }}</label>
+        <input name="code" type="text" required
+          class="appearance-none rounded-xl relative block w-full px-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:border-amber-500 text-sm tracking-widest"
+          placeholder="123456" />
+      </div>
+      <button type="submit"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        {{ t('auth.enable2fa') }}
+      </button>
+    </form>
+  {% endif %}
+
+  <div class="text-center mt-6">
+    <a href="{{ url_for('main.index') }}"
+      class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-amber-600 transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> {{ t('auth.back') }}
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ t('auth.twoFactorTitle') }} — V1 Travel{% endblock %}
+{% block content %}
+<div>
+  <div class="text-center mb-6">
+    <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 mb-3">
+      <i data-lucide="shield-check" class="w-7 h-7 text-emerald-700"></i>
+    </div>
+    <h2 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.twoFactorTitle') }}</h2>
+    <p class="mt-1 text-sm text-emerald-700">{{ t('auth.twoFactorSubtitle') }}</p>
+  </div>
+
+  <form class="space-y-4" method="post" action="{{ url_for('auth.two_factor') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div>
+      <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.twoFactorCode') }}</label>
+      <div class="relative">
+        <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"></i>
+        <input name="code" type="text" autofocus autocomplete="one-time-code"
+          class="appearance-none rounded-xl relative block w-full pl-10 pr-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:border-amber-500 text-sm tracking-widest"
+          placeholder="123456" />
+      </div>
+      <p class="mt-1 text-[11px] text-emerald-600">{{ t('auth.recoveryCodeNote') }}</p>
+    </div>
+
+    <div class="pt-2">
+      <button type="submit"
+        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 transition-all bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        {{ t('auth.verifyButton') }}
+      </button>
+    </div>
+  </form>
+
+  <div class="text-center mt-6">
+    <a href="{{ url_for('auth.login') }}"
+      class="text-xs font-medium text-emerald-700 hover:text-amber-600">← {{ t('auth.backToLogin') }}</a>
+  </div>
+</div>
+{% endblock %}

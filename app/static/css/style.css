@@ -1,0 +1,15 @@
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-moul {
+  font-family: 'Moul', sans-serif;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ecfdf5 inset;
+  -webkit-text-fill-color: #064e3b;
+}

@@ -267,9 +267,12 @@ def logout():
 # --------------------------------------------------------------------------
 # Change password
 # --------------------------------------------------------------------------
-@auth_bp.route("/change-password", methods=["POST"])
+@auth_bp.route("/change-password", methods=["GET", "POST"])
 @login_required
 def change_password():
+    if request.method == "GET":
+        return redirect(url_for("main.index") + "#password")
+
     user = current_user()
     current = request.form.get("current_password") or ""
     new = request.form.get("new_password") or ""

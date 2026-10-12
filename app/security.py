@@ -38,7 +38,12 @@ def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not current_user():
-            return redirect(url_for("auth.login", redirect=request.path))
+            # Only remember the target for GET requests: after logging in the
+            # browser re-requests it as a GET, which would fail with 405 for
+            # POST-only routes (e.g. change-password).
+            if request.method == "GET":
+                return redirect(url_for("auth.login", redirect=request.path))
+            return redirect(url_for("auth.login"))
         return view(*args, **kwargs)
 
     return wrapped

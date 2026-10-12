@@ -1,10 +1,46 @@
+/* Local Khmer fonts (app/asset/kh-fonts), served at /asset/kh-fonts/ */
+@font-face {
+  font-family: 'Khmer OS';
+  src: url('/asset/kh-fonts/KhmerOSsiemreap.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Khmer OS Muol';
+  src: url('/asset/kh-fonts/KhmerOSmuol.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.font-moul {
-  font-family: 'Moul', sans-serif;
+/* English interface uses Calibri. */
+html[lang="en"] body,
+html[lang="en"] .font-moul,
+html[lang="en"] button,
+html[lang="en"] input,
+html[lang="en"] textarea,
+html[lang="en"] select {
+  font-family: Calibri, 'Segoe UI', 'Calibri Light', sans-serif;
+}
+
+/* Khmer interface uses the local Khmer OS fonts. */
+html[lang="km"] body,
+html[lang="km"] button,
+html[lang="km"] input,
+html[lang="km"] textarea,
+html[lang="km"] select {
+  font-family: 'Khmer OS', 'Khmer OS Siemreap', sans-serif;
+}
+
+html[lang="km"] .font-moul {
+  font-family: 'Khmer OS Muol', 'Moul', sans-serif;
 }
 
 input:-webkit-autofill,

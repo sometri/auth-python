@@ -1,56 +1,192 @@
-{% extends "base.html" %}
-{% block title %}{{ t('auth.dashboardTitle') }} — V1 Travel{% endblock %}
+{% extends "base_dashboard.html" %}
+{% block title %}{{ t('auth.dash.overview') }} — Account & Security{% endblock %}
 {% block content %}
-<div>
-  <div class="text-center mb-6">
-    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-3">
-      <i data-lucide="check-circle-2" class="w-9 h-9 text-emerald-600"></i>
+
+<section id="overview" class="scroll-mt-24 mb-8">
+  <h1 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.dash.greeting') }}, {{ current_user['name'] }}</h1>
+  <p class="text-sm text-emerald-600">{{ t('auth.dash.subtitle') }}</p>
+</section>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+  <div class="bg-white rounded-2xl border border-emerald-100 p-4 shadow-sm">
+    <div class="flex items-center gap-2 text-emerald-500 mb-2">
+      <i data-lucide="badge-check" class="w-4 h-4"></i>
+      <span class="text-[11px] font-bold uppercase tracking-wide">{{ t('auth.dash.statRole') }}</span>
     </div>
-    <h2 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.dashboardTitle') }}</h2>
-    <p class="mt-1 text-sm text-emerald-700">{{ t('auth.dashboardSubtitle') }}</p>
+    <p class="text-lg font-bold text-emerald-900">{{ current_user['role'] }}</p>
   </div>
 
-  {% if current_user %}
-    <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 mb-4">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-full bg-amber-500 text-emerald-950 flex items-center justify-center font-bold">
-          {{ current_user['name'][:1]|upper }}
-        </div>
-        <div class="text-left">
-          <p class="text-sm font-bold text-emerald-900">{{ current_user['name'] }}</p>
-          <p class="text-xs text-emerald-600">{{ current_user['email'] }}</p>
-        </div>
-      </div>
-      <div class="mt-3 text-[11px] text-emerald-600">
-        {{ t('auth.twoFactorOn') if current_user['two_factor_enabled'] else t('auth.twoFactorOff') }} · {{ current_user['role'] }}
-      </div>
+  <div class="bg-white rounded-2xl border border-emerald-100 p-4 shadow-sm">
+    <div class="flex items-center gap-2 text-emerald-500 mb-2">
+      <i data-lucide="shield" class="w-4 h-4"></i>
+      <span class="text-[11px] font-bold uppercase tracking-wide">{{ t('auth.dash.stat2fa') }}</span>
     </div>
+    {% if current_user['two_factor_enabled'] %}
+      <p class="text-lg font-bold text-emerald-600">{{ t('auth.dash.enabled') }}</p>
+    {% else %}
+      <p class="text-lg font-bold text-rose-600">{{ t('auth.dash.disabled') }}</p>
+    {% endif %}
+  </div>
 
-    <div class="space-y-2">
-      <a href="{{ url_for('auth.two_factor_settings') }}"
-        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-emerald-200 bg-white text-sm font-bold rounded-xl text-emerald-900 hover:border-amber-500 transition-all">
-        <i data-lucide="shield" class="w-4 h-4"></i>
-        {{ t('auth.twoFactorSettings') }}
-      </a>
-      <a href="{{ url_for('auth.logout') }}"
-        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
-        <i data-lucide="log-out" class="w-4 h-4"></i>
-        {{ t('auth.logout') }}
-      </a>
+  <div class="bg-white rounded-2xl border border-emerald-100 p-4 shadow-sm">
+    <div class="flex items-center gap-2 text-emerald-500 mb-2">
+      <i data-lucide="key-round" class="w-4 h-4"></i>
+      <span class="text-[11px] font-bold uppercase tracking-wide">{{ t('auth.dash.statRecovery') }}</span>
     </div>
-  {% else %}
-    <div class="space-y-2">
-      <a href="{{ url_for('auth.login') }}"
-        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
-        <i data-lucide="log-in" class="w-4 h-4"></i>
-        {{ t('auth.loginButton') }}
-      </a>
-      <a href="{{ url_for('auth.register') }}"
-        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-emerald-200 bg-white text-sm font-bold rounded-xl text-emerald-900 hover:border-amber-500 transition-all">
-        <i data-lucide="user-plus" class="w-4 h-4"></i>
-        {{ t('auth.register') }}
-      </a>
+    <p class="text-lg font-bold text-emerald-900">{{ recovery_remaining }}</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-emerald-100 p-4 shadow-sm">
+    <div class="flex items-center gap-2 text-emerald-500 mb-2">
+      <i data-lucide="calendar-days" class="w-4 h-4"></i>
+      <span class="text-[11px] font-bold uppercase tracking-wide">{{ t('auth.dash.statSince') }}</span>
     </div>
-  {% endif %}
+    <p class="text-lg font-bold text-emerald-900">{{ current_user['created_at'][:10] }}</p>
+    <p class="text-[11px] text-emerald-500">{{ account_days }} {{ t('auth.dash.days') }}</p>
+  </div>
 </div>
+
+<section id="profile" class="scroll-mt-24 mb-10">
+  <h2 class="text-lg font-bold text-emerald-900 mb-3">{{ t('auth.dash.profile') }}</h2>
+  <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+    <div class="flex items-center gap-4 p-5 border-b border-emerald-100 bg-emerald-50/40">
+      <div class="w-14 h-14 rounded-full bg-emerald-900 text-white flex items-center justify-center text-xl font-bold">
+        {{ current_user['name'][:1]|upper }}
+      </div>
+      <div>
+        <p class="font-bold text-emerald-900">{{ current_user['name'] }}</p>
+        <p class="text-xs text-emerald-600">{{ current_user['email'] }}</p>
+      </div>
+    </div>
+    <dl class="divide-y divide-emerald-50 text-sm">
+      <div class="flex justify-between gap-4 px-5 py-3">
+        <dt class="text-emerald-500 font-medium">{{ t('auth.dash.name') }}</dt>
+        <dd class="text-emerald-900 font-bold">{{ current_user['name'] }}</dd>
+      </div>
+      <div class="flex justify-between gap-4 px-5 py-3">
+        <dt class="text-emerald-500 font-medium">{{ t('auth.dash.email') }}</dt>
+        <dd class="text-emerald-900 font-bold">{{ current_user['email'] }}</dd>
+      </div>
+      <div class="flex justify-between gap-4 px-5 py-3">
+        <dt class="text-emerald-500 font-medium">{{ t('auth.dash.role') }}</dt>
+        <dd class="text-emerald-900 font-bold">{{ current_user['role'] }}</dd>
+      </div>
+      <div class="flex justify-between gap-4 px-5 py-3">
+        <dt class="text-emerald-500 font-medium">{{ t('auth.dash.memberSince') }}</dt>
+        <dd class="text-emerald-900 font-bold">{{ current_user['created_at'][:10] }}</dd>
+      </div>
+      <div class="flex justify-between gap-4 px-5 py-3">
+        <dt class="text-emerald-500 font-medium">{{ t('auth.dash.userId') }}</dt>
+        <dd class="text-emerald-900 font-mono">{{ current_user['id'] }}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section id="security" class="scroll-mt-24 mb-10">
+  <h2 class="text-lg font-bold text-emerald-900 mb-3">{{ t('auth.dash.security') }}</h2>
+  <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm p-5">
+    <div class="flex items-start gap-4">
+      <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0
+        {% if current_user['two_factor_enabled'] %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %}">
+        <i data-lucide="{% if current_user['two_factor_enabled'] %}shield-check{% else %}shield-alert{% endif %}" class="w-5 h-5"></i>
+      </div>
+      <div class="flex-1">
+        <p class="font-bold text-emerald-900">{{ t('auth.dash.security2faTitle') }}</p>
+        <p class="text-xs text-emerald-600 mt-0.5">
+          {% if current_user['two_factor_enabled'] %}
+            {{ t('auth.dash.security2faOn') }}
+          {% else %}
+            {{ t('auth.dash.security2faOff') }}
+          {% endif %}
+        </p>
+        {% if current_user['two_factor_enabled'] %}
+          <p class="text-[11px] text-amber-700 mt-2">{{ recovery_remaining }} {{ t('auth.dash.recoveryRemaining') }}</p>
+        {% endif %}
+      </div>
+      <a href="{{ url_for('auth.two_factor_settings') }}"
+        class="shrink-0 inline-flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-bold text-emerald-950 bg-amber-500 hover:bg-amber-400 transition-colors">
+        <i data-lucide="settings" class="w-4 h-4"></i> {{ t('auth.dash.manage2fa') }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="password" class="scroll-mt-24 mb-10">
+  <h2 class="text-lg font-bold text-emerald-900 mb-3">{{ t('auth.dash.changePassword') }}</h2>
+  <form method="post" action="{{ url_for('auth.change_password') }}"
+    class="bg-white rounded-2xl border border-emerald-100 shadow-sm p-5 space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div>
+      <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.dash.currentPassword') }}</label>
+      <input name="current_password" type="password" required autocomplete="current-password"
+        class="appearance-none rounded-xl block w-full px-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 focus:outline-none focus:border-amber-500 text-sm" />
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.newPassword') }}</label>
+        <input name="new_password" type="password" required minlength="6" autocomplete="new-password"
+          class="appearance-none rounded-xl block w-full px-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 focus:outline-none focus:border-amber-500 text-sm" />
+      </div>
+      <div>
+        <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.confirmPassword') }}</label>
+        <input name="confirm_password" type="password" required minlength="6" autocomplete="new-password"
+          class="appearance-none rounded-xl block w-full px-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 focus:outline-none focus:border-amber-500 text-sm" />
+      </div>
+    </div>
+    <p class="text-[11px] text-emerald-500">{{ t('auth.passwordMinLengthShort') }}</p>
+    <div>
+      <button type="submit"
+        class="inline-flex items-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
+        <i data-lucide="key-round" class="w-4 h-4"></i> {{ t('auth.dash.updatePassword') }}
+      </button>
+    </div>
+  </form>
+</section>
+
+<section id="activity" class="scroll-mt-24">
+  <h2 class="text-lg font-bold text-emerald-900 mb-3">{{ t('auth.dash.activityTitle') }}</h2>
+  <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+    {% if events %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-[11px] uppercase tracking-wide text-emerald-500 border-b border-emerald-100">
+              <th class="px-5 py-3 font-bold">{{ t('auth.dash.colTime') }}</th>
+              <th class="px-5 py-3 font-bold">{{ t('auth.dash.colStatus') }}</th>
+              <th class="px-5 py-3 font-bold">{{ t('auth.dash.colIp') }}</th>
+              <th class="px-5 py-3 font-bold hidden sm:table-cell">{{ t('auth.dash.colDevice') }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-emerald-50">
+            {% for ev in events %}
+            {% set s = ev['status'] %}
+            <tr>
+              <td class="px-5 py-3 text-emerald-700 whitespace-nowrap">{{ ev['created_at'][:19].replace('T', ' ') }}</td>
+              <td class="px-5 py-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold
+                  {% if s in ('failed', '2fa_failed') %}bg-rose-50 text-rose-700
+                  {% elif s == 'password_changed' %}bg-amber-50 text-amber-700
+                  {% else %}bg-emerald-50 text-emerald-700{% endif %}">
+                  {% if s == 'success' %}{{ t('auth.dash.statusSuccess') }}
+                  {% elif s == 'failed' %}{{ t('auth.dash.statusFailed') }}
+                  {% elif s == '2fa_success' %}{{ t('auth.dash.status2fa') }}
+                  {% elif s == '2fa_failed' %}{{ t('auth.dash.status2faFailed') }}
+                  {% elif s == 'password_changed' %}{{ t('auth.dash.statusPassword') }}
+                  {% else %}{{ s }}{% endif %}
+                </span>
+              </td>
+              <td class="px-5 py-3 text-emerald-700 font-mono text-xs">{{ ev['ip'] }}</td>
+              <td class="px-5 py-3 text-emerald-500 text-xs hidden sm:table-cell">{{ (ev['user_agent'] or '')[:40] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="px-5 py-8 text-center text-sm text-emerald-500">{{ t('auth.dash.activityEmpty') }}</p>
+    {% endif %}
+  </div>
+</section>
+
 {% endblock %}

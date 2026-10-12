@@ -20,11 +20,13 @@ def create_user(name, email, password, role="CUSTOMER"):
         """
         INSERT INTO users (name, email, password_hash, role, created_at)
         VALUES (?, ?, ?, ?, ?)
+        RETURNING id
         """,
         (name, email, generate_password_hash(password), role, _now().isoformat()),
     )
+    new_id = cur.fetchone()["id"]
     db.commit()
-    return cur.lastrowid
+    return new_id
 
 
 def get_user_by_email(email):
@@ -42,6 +44,10 @@ def verify_credentials(email, password):
     if user and check_password_hash(user["password_hash"], password):
         return user
     return None
+
+
+def verify_password(user, password):
+    return check_password_hash(user["password_hash"], password)
 
 
 def set_password(user_id, password):
@@ -134,3 +140,34 @@ def consume_recovery_code(user, code):
     )
     db.commit()
     return True
+
+
+def recovery_codes_remaining(user):
+    if not user["recovery_codes"]:
+        return 0
+    try:
+        return len(json.loads(user["recovery_codes"]))
+    except (TypeError, ValueError):
+        return 0
+
+
+# --------------------------------------------------------------------------
+# Login activity log
+# --------------------------------------------------------------------------
+def record_login_event(user_id, email, status, ip=None, user_agent=None):
+    db = get_db()
+    db.execute(
+        """
+        INSERT INTO login_events (user_id, email, ip, user_agent, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (user_id, email, ip, user_agent, status, _now().isoformat()),
+    )
+    db.commit()
+
+
+def list_login_events(user_id, limit=8):
+    return get_db().execute(
+        "SELECT * FROM login_events WHERE user_id = ? ORDER BY id DESC LIMIT ?",
+        (user_id, limit),
+    ).fetchall()

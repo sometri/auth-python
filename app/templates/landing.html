@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ t('auth.dash.landingTitle') }} — Account & Security{% endblock %}
+{% block content %}
+<div>
+  <div class="text-center mb-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-3">
+      <i data-lucide="shield-check" class="w-9 h-9 text-emerald-700"></i>
+    </div>
+    <h2 class="text-2xl font-bold font-moul text-emerald-900">{{ t('auth.dash.landingTitle') }}</h2>
+    <p class="mt-1 text-sm text-emerald-700">{{ t('auth.dash.landingSubtitle') }}</p>
+  </div>
+
+  <div class="space-y-2">
+    <a href="{{ url_for('auth.login') }}"
+      class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-sm font-bold rounded-xl text-emerald-950 bg-amber-500 hover:bg-amber-400 shadow-md active:scale-95 transition-all">
+      <i data-lucide="log-in" class="w-4 h-4"></i>
+      {{ t('auth.loginButton') }}
+    </a>
+    <a href="{{ url_for('auth.register') }}"
+      class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-emerald-200 bg-white text-sm font-bold rounded-xl text-emerald-900 hover:border-amber-500 transition-all">
+      <i data-lucide="user-plus" class="w-4 h-4"></i>
+      {{ t('auth.register') }}
+    </a>
+  </div>
+</div>
+{% endblock %}

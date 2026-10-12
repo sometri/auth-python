@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ t('auth.twoFactorSettings') }} — V1 Travel{% endblock %}
+{% block title %}{{ t('auth.twoFactorSettings') }} — Account & Security{% endblock %}
 {% block content %}
 <div>
   <div class="text-center mb-6">
@@ -42,13 +42,34 @@
       <p class="font-mono text-[10px] text-emerald-500 break-all">{{ otpauth_uri }}</p>
     </div>
 
+    <div data-totp-secret="{{ pending_secret }}" data-totp-uri="{{ otpauth_uri }}">
+      <div class="mb-4 flex flex-col items-center">
+        <div id="totp-qr" class="p-3 bg-white border border-emerald-100 rounded-2xl shadow-sm"></div>
+        <p class="text-[11px] text-emerald-600 mt-2">{{ t('auth.scanQr') }}</p>
+      </div>
+
+      {% if config['DEBUG'] %}
+      <div class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200">
+        <p class="text-[11px] font-bold text-amber-900 mb-1">Local test helper (dev only)</p>
+        <div class="flex items-center gap-3">
+          <span id="totp-code" class="font-mono text-2xl font-bold text-amber-900 tracking-widest">------</span>
+          <span id="totp-left" class="text-[11px] text-amber-700"></span>
+          <button type="button" id="totp-fill"
+            class="ml-auto text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500 text-emerald-950 hover:bg-amber-400">
+            Fill code
+          </button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
     <form class="space-y-4" method="post" action="{{ url_for('auth.two_factor_settings') }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="action" value="enable" />
       <input type="hidden" name="secret" value="{{ pending_secret }}" />
       <div>
         <label class="block text-emerald-900 text-xs font-bold mb-1">{{ t('auth.twoFactorCode') }}</label>
-        <input name="code" type="text" required
+        <input id="totp-input" name="code" type="text" required
           class="appearance-none rounded-xl relative block w-full px-3 py-2.5 border border-emerald-200 bg-emerald-50/40 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:border-amber-500 text-sm tracking-widest"
           placeholder="123456" />
       </div>
@@ -66,5 +87,4 @@
       <i data-lucide="arrow-left" class="w-4 h-4"></i> {{ t('auth.back') }}
     </a>
   </div>
-</div>
 {% endblock %}

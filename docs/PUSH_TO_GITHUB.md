@@ -1,6 +1,6 @@
 # Guide: Push This Project to GitHub
 
-This guide pushes the **V1 Travel — Auth** project to its GitHub repository:
+This guide pushes the **Account & Security** project to its GitHub repository:
 
 - **GitHub username:** `sometri`
 - **Name:** Sometri OENG
@@ -46,7 +46,7 @@ auth.db
 ## Step 4 — Stage the files you want to publish
 
 ```bash
-git add app run.py requirements.txt requirements-dev.txt README.md .env.example docs .gitignore
+git add app run.py requirements.txt requirements-dev.txt docs .env.example .gitignore
 ```
 
 ## Step 5 — Create the first commit

@@ -6,3 +6,5 @@ venv/
 auth.db
 *.db
 .pytest_cache/
+server.log
+*.log

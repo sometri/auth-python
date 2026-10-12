@@ -1,6 +1,6 @@
 # Guide: Clone This Project to Your Local PC
 
-This guide shows how to copy (clone) the **V1 Travel — Auth** project from GitHub
+This guide shows how to copy (clone) the **Account & Security** project from GitHub
 onto your own computer.
 
 **Repository:** https://github.com/sometri/auth-python

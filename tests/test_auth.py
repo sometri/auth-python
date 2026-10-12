@@ -28,7 +28,7 @@ def test_register_then_login(client):
         data={"email": "qa@v1travel.com", "password": "secret123"},
         follow_redirects=True,
     )
-    assert b"You are signed in" in resp.data
+    assert b"Recent activity" in resp.data
     assert b"Log out" in resp.data
 
 
@@ -89,7 +89,7 @@ def test_forgot_and_reset_password(app, client, make_user):
         data={"email": "user@v1travel.com", "password": "brandnew1"},
         follow_redirects=True,
     )
-    assert b"You are signed in" in resp.data
+    assert b"Recent activity" in resp.data
 
 
 def test_invalid_reset_token(client):
@@ -119,7 +119,7 @@ def test_two_factor_login_flow(app, client, make_user):
         "/auth/two-factor", data={"code": pyotp.TOTP(secret).now()},
         follow_redirects=True,
     )
-    assert b"You are signed in" in resp.data
+    assert b"Recent activity" in resp.data
 
 
 def test_recovery_code_works_once(app, client, make_user):
@@ -135,7 +135,7 @@ def test_recovery_code_works_once(app, client, make_user):
     resp = client.post(
         "/auth/two-factor", data={"code": "recovery123"}, follow_redirects=True
     )
-    assert b"You are signed in" in resp.data
+    assert b"Recent activity" in resp.data
 
     client.get("/auth/logout")
     with app.app_context():

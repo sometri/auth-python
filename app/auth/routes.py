@@ -32,6 +32,18 @@ def _complete_login(user):
     session.permanent = True
 
 
+def _log_event(user, status):
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "?")
+    ip = ip.split(",")[0].strip()
+    services.record_login_event(
+        user["id"],
+        user["email"],
+        status,
+        ip=ip,
+        user_agent=request.user_agent.string[:255],
+    )
+
+
 # --------------------------------------------------------------------------
 # Register
 # --------------------------------------------------------------------------
@@ -89,6 +101,9 @@ def login():
 
         user = services.verify_credentials(email, password)
         if not user:
+            known = services.get_user_by_email(email)
+            if known:
+                _log_event(known, "failed")
             flash(t("auth.invalidCredentials"), "error")
             return render_template("login.html", email=email)
 
@@ -99,6 +114,7 @@ def login():
             return redirect(url_for("auth.two_factor"))
 
         _complete_login(user)
+        _log_event(user, "success")
         redirect_target = request.form.get("redirect") or request.args.get("redirect")
         if is_safe_redirect(redirect_target):
             return redirect(redirect_target)
@@ -131,11 +147,16 @@ def two_factor():
         if valid:
             session.pop("pending_2fa_user", None)
             _complete_login(user)
+            _log_event(user, "2fa_success")
             return redirect(url_for("main.index"))
 
+        _log_event(user, "2fa_failed")
         flash(t("auth.errors.invalid2fa"), "error")
 
-    return render_template("two_factor.html")
+    return render_template(
+        "two_factor.html",
+        dev_secret=user["two_factor_secret"] if current_app.debug else None,
+    )
 
 
 # --------------------------------------------------------------------------
@@ -224,7 +245,7 @@ def two_factor_settings():
     if not user["two_factor_enabled"]:
         pending_secret = pyotp.random_base32()
         otpauth_uri = pyotp.TOTP(pending_secret).provisioning_uri(
-            name=user["email"], issuer_name="V1 Travel"
+            name=user["email"], issuer_name="Account & Security"
         )
     elif user["recovery_codes"]:
         recovery_codes = json.loads(user["recovery_codes"])
@@ -241,3 +262,28 @@ def two_factor_settings():
 def logout():
     session.clear()
     return redirect(url_for("auth.login"))
+
+
+# --------------------------------------------------------------------------
+# Change password
+# --------------------------------------------------------------------------
+@auth_bp.route("/change-password", methods=["POST"])
+@login_required
+def change_password():
+    user = current_user()
+    current = request.form.get("current_password") or ""
+    new = request.form.get("new_password") or ""
+    confirm = request.form.get("confirm_password") or ""
+
+    if not services.verify_password(user, current):
+        flash(t("auth.errors.wrongPassword"), "error")
+    elif new != confirm:
+        flash(t("auth.errors.passwordsDontMatch"), "error")
+    elif len(new) < 6:
+        flash(t("auth.errors.passwordTooShort"), "error")
+    else:
+        services.set_password(user["id"], new)
+        _log_event(user, "password_changed")
+        flash(t("auth.passwordChanged"), "success")
+
+    return redirect(url_for("main.index") + "#password")

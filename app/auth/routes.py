@@ -225,17 +225,25 @@ def two_factor_settings():
         action = request.form.get("action")
 
         if action == "enable":
-            secret = request.form.get("secret") or pyotp.random_base32()
+            secret = (
+                request.form.get("secret")
+                or session.get("pending_totp_secret")
+                or pyotp.random_base32()
+            )
             code = (request.form.get("code") or "").strip()
             if pyotp.TOTP(secret).verify(code, valid_window=1):
                 recovery = [secrets.token_hex(5) for _ in range(8)]
                 services.enable_two_factor(user["id"], secret, recovery)
+                session.pop("pending_totp_secret", None)
                 flash(t("auth.twoFactorEnabledMsg"), "success")
                 return redirect(url_for("auth.two_factor_settings"))
+            # Keep the same secret so the QR the user already scanned stays valid.
+            session["pending_totp_secret"] = secret
             flash(t("auth.errors.invalid2fa"), "error")
 
         elif action == "disable":
             services.disable_two_factor(user["id"])
+            session.pop("pending_totp_secret", None)
             flash(t("auth.twoFactorDisabledMsg"), "success")
             return redirect(url_for("auth.two_factor_settings"))
 
@@ -243,7 +251,8 @@ def two_factor_settings():
     pending_secret = otpauth_uri = recovery_codes = None
 
     if not user["two_factor_enabled"]:
-        pending_secret = pyotp.random_base32()
+        pending_secret = session.get("pending_totp_secret") or pyotp.random_base32()
+        session["pending_totp_secret"] = pending_secret
         otpauth_uri = pyotp.TOTP(pending_secret).provisioning_uri(
             name=user["email"], issuer_name="Account & Security"
         )
